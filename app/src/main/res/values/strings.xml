@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Langones_TurnBasedGame</string>
+    <string name="desc">yellow begone</string>
+    <string name="hero">Natures Prophet</string>
+    <string name="monsName">Mage</string>
+    <string name="fight">FIGHT</string>
+    <string name="rest">REST</string>
+</resources>
