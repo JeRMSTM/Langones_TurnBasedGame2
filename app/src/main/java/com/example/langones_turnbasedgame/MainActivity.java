@@ -44,43 +44,43 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     //Mage Stats
     String monsName = "Mage";
-    int monsHp = 300;
-    int monsMaxHp = 300;
-    int monsMp = 100;
-    int monsMaxMp = 100;
-    int monsDamage;
+    int mageHp = 300;
+    int mageMaxHp = 300;
+    int mageMp = 100;
+    int mageMaxMp = 100;
+    int mageDamage;
     //MonsHp
     int monsHpPercent,monsMpPercent;
 
     /////Skill Info/////
     //Fight
-    int basicAttackMin = 35;
-    int basicAttackMax = 50;
-    int basicAttackChance = 80;
-    int basicAttackManaCost = 0;
+    int fightMinDMG = 35;
+    int fightMaxDMG = 50;
+    int fightATKChance = 80;
+    int fightATKManaCost = 0;
     //Rest
-    int basicHealMin = 20;
-    int basicHealMax = 90;
-    int basicHealChance = 50;
-    int basicHealManaCost = 30;
+    int restHealMin = 20;
+    int restHealMax = 50;
+    int restHealChance = 50;
+    int restHealManaCost = 40;
     int healing;
     //random number
     int random;
-    //monsFight
-    int monsAtkMin = 40;
-    int monsAtkMax = 100;
-    int monsAtkChance = 55;
+    //Mage Attack
+    int mageAtkMin = 40;
+    int mageAtkMax = 100;
+    int mageATKChance = 55;
 
 
     //Button state
-    boolean heroBasicAttack = false;
+    boolean herofight = false;
     boolean heroRest = false;
 
     //Speed System inspired by Epic Seven
-    int heroSpd = 100;
-    int heroCurrentSpd;
-    int monsSpd = 70;
-    int monsCurrentSpd;
+    int heroSPD = 100;
+    int heroCurrentSPD;
+    int monsSPD = 70;
+    int monsCurrentSPD;
     //the number required for a character to take a turn
     int speedCap = 540;
 
@@ -88,28 +88,28 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     //implementation of Speed System
     public void speed(){
-        while(heroCurrentSpd <= speedCap && monsCurrentSpd <= speedCap){
-            heroCurrentSpd += heroSpd;
-            monsCurrentSpd += monsSpd;
+        while(heroCurrentSPD <= speedCap && monsCurrentSPD <= speedCap){
+            heroCurrentSPD += heroSPD;
+            monsCurrentSPD += monsSPD;
         }
-        if (heroCurrentSpd == monsCurrentSpd) {
+        if (heroCurrentSPD == monsCurrentSPD) {
             Random randomizer = new Random();
             int rng = randomizer.nextInt(99);
             if (rng >= 50) {
-                heroCurrentSpd -=15;
+                heroCurrentSPD -=15;
             } else {
-                monsCurrentSpd -=15;
+                monsCurrentSPD -=15;
             }
         }
     }
 
     //Progress Bars
-    public void bar() {
+    public void progressbar() {
         //formula used to get health and mana percentage
         heroHpPercent = heroHp * 100 / heroMaxHp;
         heroMpPercent = heroMp * 100 / heroMaxMp;
-        monsHpPercent = monsHp * 100 / monsMaxHp;
-        monsMpPercent = monsMp * 100 / monsMaxMp;
+        monsHpPercent = mageHp * 100 / mageMaxHp;
+        monsMpPercent = mageMp * 100 / mageMaxMp;
         //setting up hp and mp bar
         heroHpBar.setProgress(heroHpPercent, true);
         heroMpBar.setProgress(heroMpPercent, true);
@@ -137,7 +137,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     //Checks which character gets the turn
     public void turnCheck(){
-        if (heroCurrentSpd >= speedCap){
+        if (heroCurrentSPD >= speedCap){
             showButton();
         }else {
             hideButton();
@@ -163,38 +163,38 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
         heroHp = heroMaxHp;
         heroMp = heroMaxMp;
-        monsHp = monsMaxHp;
-        monsMp = monsMaxMp;
+        mageHp = mageMaxHp;
+        mageMp = mageMaxMp;
         heroDamage = 0;
-        heroCurrentSpd = 0;
-        monsDamage = 0;
-        monsCurrentSpd = 0;
+        heroCurrentSPD = 0;
+        mageDamage = 0;
+        monsCurrentSPD = 0;
     }
 
     public void monsAtk() {
         Random randomizer = new Random();
-        int monsRNG = randomizer.nextInt(70);
-        if (monsRNG < monsAtkChance) {
-            monsDamage = randomizer.nextInt(monsAtkMax - monsAtkMin) + monsAtkMin;
-            heroHp -= monsDamage;
-            menuText.setText(monsName + " has dealt " + monsDamage + " to " + heroName);
+        int mageRNG = randomizer.nextInt(70);
+        if (mageRNG < mageATKChance) {
+            mageDamage = randomizer.nextInt(mageAtkMax - mageAtkMin) + mageAtkMin;
+            heroHp -= mageDamage;
+            menuText.setText(monsName + " has dealt " + mageDamage + " to " + heroName);
         } else {
             menuText.setText(monsName + " is observing you.");
         }
-        monsCurrentSpd -= speedCap;
-        bar();
+        monsCurrentSPD -= speedCap;
+        progressbar();
     }
 
     public void battlePhase() {
         Random randomizer = new Random();
         random = randomizer.nextInt(100) + 1;
-        if (heroCurrentSpd >= speedCap && heroCurrentSpd > monsCurrentSpd) {
-            if (heroBasicAttack) {
+        if (heroCurrentSPD >= speedCap && heroCurrentSPD > monsCurrentSPD) {
+            if (herofight) {
                 //this will check the basic attack hit chance
-                if (random < basicAttackChance) {
+                if (random < fightATKChance) {
                     int mpRegen = 10;
-                    heroDamage = randomizer.nextInt(basicAttackMax - basicAttackMin) + basicAttackMin;
-                    monsHp -= heroDamage;
+                    heroDamage = randomizer.nextInt(fightMaxDMG - fightMinDMG) + fightMinDMG;
+                    mageHp -= heroDamage;
                     heroMp += mpRegen;
                     menuText.setText(heroName + " has dealt " +heroDamage + " damage to " +  monsName);
                 } else {
@@ -202,39 +202,39 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 }
                 //this will check if the hero's MP is full
                 if (heroHp != heroMaxHp && heroMp < heroMaxMp) {
-                    heroMp += basicAttackManaCost;
+                    heroMp += fightATKManaCost;
                 }
 
-                heroCurrentSpd -= speedCap;
-                heroBasicAttack = false;
+                heroCurrentSPD -= speedCap;
+                herofight = false;
                 hideButton();
-                bar();
+                progressbar();
             }
             if (heroRest) {
                 //checks if the healing will proc
-                if (random < basicHealChance) {
-                    healing = randomizer.nextInt(basicHealMax - basicHealMin) + basicHealMin;
+                if (random < restHealChance) {
+                    healing = randomizer.nextInt(restHealMax - restHealMin) + restHealMin;
                     heroHp += healing;
                     menuText.setText(heroName + " has healed himself " + healing + " HP");
-                    heroMp -= basicHealManaCost;
+                    heroMp -= restHealManaCost;
                     hideButton();
-                    bar();
+                    progressbar();
                     heroRest = false;
                 }
 
             }
             //victory statement
-            if (monsHp <= 0) {
+            if (mageHp <= 0) {
                 heroWin = true;
                 reset();
-                bar();
+                progressbar();
             }
         }else {
         monsAtk();
             }
         if (heroHp <= 0) {
             reset();
-            bar();
+            progressbar();
         }
 
     }
@@ -288,12 +288,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mwinIndicator.setVisibility(View.GONE);
         switch (v.getId()) {
             case R.id.fight:
-                heroBasicAttack = true;
+                herofight = true;
                 battlePhase();
                 break;
             case R.id.rest:
                 //this will check if the hero was enough mana points
-                if (heroMp - basicHealManaCost >= 0) {
+                if (heroMp - restHealManaCost >= 0) {
                     heroRest = true;
                     battlePhase();
                 }else {
