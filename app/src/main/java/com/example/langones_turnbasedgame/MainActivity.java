@@ -171,7 +171,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         monsCurrentSPD = 0;
     }
 
-    public void monsAtk() {
+    public void mageATK() {
         Random randomizer = new Random();
         int mageRNG = randomizer.nextInt(70);
         if (mageRNG < mageATKChance) {
@@ -230,7 +230,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 progressbar();
             }
         }else {
-        monsAtk();
+        mageATK();
             }
         if (heroHp <= 0) {
             reset();
