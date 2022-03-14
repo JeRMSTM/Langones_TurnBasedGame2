@@ -23,13 +23,10 @@ import java.util.Random;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener{
 
-    //hp and mp bars
+
     ProgressBar heroHpBar,heroMpBar,monsHpBar,monsMpBar;
-    //buttons
     Button fight,rest;
-    //text
     TextView mheroName,mmonsName,menuText,mwinIndicator;
-    //layout
     ConstraintLayout menuBox;
 
     //Nature's Prophet Stats
@@ -55,53 +52,32 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     /////Skill Info/////
     //Fight
     int fightMinDMG = 35;
-    int fightMaxDMG = 50;
+    int fightMaxDMG = 60;
     int fightATKChance = 80;
     int fightATKManaCost = 0;
     //Rest
-    int restHealMin = 20;
-    int restHealMax = 50;
-    int restHealChance = 50;
-    int restHealManaCost = 40;
+    int restHealMin = 60;
+    int restHealMax = 110;
+    int restHealChance = 65;
+    int restHealManaCost = 50;
     int healing;
     //random number
     int random;
     //Mage Attack
     int mageAtkMin = 40;
     int mageAtkMax = 100;
-    int mageATKChance = 55;
+    int mageATKChance = 60;
+    //turn system
+    int turn = 1;
 
 
     //Button state
     boolean herofight = false;
     boolean heroRest = false;
 
-    //Speed System inspired by Epic Seven
-    int heroSPD = 100;
-    int heroCurrentSPD;
-    int monsSPD = 70;
-    int monsCurrentSPD;
-    //the number required for a character to take a turn
-    int speedCap = 540;
 
     boolean heroWin = false;
 
-    //implementation of Speed System
-    public void speed(){
-        while(heroCurrentSPD <= speedCap && monsCurrentSPD <= speedCap){
-            heroCurrentSPD += heroSPD;
-            monsCurrentSPD += monsSPD;
-        }
-        if (heroCurrentSPD == monsCurrentSPD) {
-            Random randomizer = new Random();
-            int rng = randomizer.nextInt(99);
-            if (rng >= 50) {
-                heroCurrentSPD -=15;
-            } else {
-                monsCurrentSPD -=15;
-            }
-        }
-    }
 
     //Progress Bars
     public void progressbar() {
@@ -136,8 +112,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     //Checks which character gets the turn
-    public void turnCheck(){
-        if (heroCurrentSPD >= speedCap){
+    public void turnSystem(){
+        if (turn ==1){
             showButton();
         }else {
             hideButton();
@@ -146,9 +122,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     //moving of turns
     public void next(){
-        speed();
-        turnCheck();
-        battlePhase();
+        turnSystem();
+        battleStart();
     }
 
     //function will reset the game
@@ -159,19 +134,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             heroWin = false;
         }else {
             mwinIndicator.setVisibility(View.VISIBLE);
-            mwinIndicator.setText("Don't give up!");
+            mwinIndicator.setText("YOU DIED");
         }
         heroHp = heroMaxHp;
         heroMp = heroMaxMp;
         mageHp = mageMaxHp;
         mageMp = mageMaxMp;
         heroDamage = 0;
-        heroCurrentSPD = 0;
         mageDamage = 0;
-        monsCurrentSPD = 0;
+        turn = 1;
     }
 
-    public void mageATK() {
+    public void mageAtk() {
         Random randomizer = new Random();
         int mageRNG = randomizer.nextInt(70);
         if (mageRNG < mageATKChance) {
@@ -181,18 +155,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         } else {
             menuText.setText(monsName + " is observing you.");
         }
-        monsCurrentSPD -= speedCap;
         progressbar();
     }
 
-    public void battlePhase() {
+    public void battleStart() {
         Random randomizer = new Random();
-        random = randomizer.nextInt(100) + 1;
-        if (heroCurrentSPD >= speedCap && heroCurrentSPD > monsCurrentSPD) {
+        random = randomizer.nextInt(100);
+        if (turn == 1) {
             if (herofight) {
                 //this will check the basic attack hit chance
                 if (random < fightATKChance) {
-                    int mpRegen = 10;
+                    int mpRegen = 5;
                     heroDamage = randomizer.nextInt(fightMaxDMG - fightMinDMG) + fightMinDMG;
                     mageHp -= heroDamage;
                     heroMp += mpRegen;
@@ -205,22 +178,29 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     heroMp += fightATKManaCost;
                 }
 
-                heroCurrentSPD -= speedCap;
                 herofight = false;
                 hideButton();
                 progressbar();
+                turn++;
             }
             if (heroRest) {
                 //checks if the healing will proc
                 if (random < restHealChance) {
+                    int mpRegen = 2;
                     healing = randomizer.nextInt(restHealMax - restHealMin) + restHealMin;
                     heroHp += healing;
+                    heroMp += mpRegen;
                     menuText.setText(heroName + " has healed himself " + healing + " HP");
                     heroMp -= restHealManaCost;
-                    hideButton();
-                    progressbar();
-                    heroRest = false;
+
+                } else {
+                    menuText.setText(heroName + " tried to rest but the Mage is preventing you to do so");
                 }
+                heroRest = false;
+                hideButton();
+                progressbar();
+                turn++;
+
 
             }
             //victory statement
@@ -230,7 +210,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 progressbar();
             }
         }else {
-        mageATK();
+        mageAtk();
+        turn--;
             }
         if (heroHp <= 0) {
             reset();
@@ -276,9 +257,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         menuBox.setOnClickListener(this);
         menuBox.setClickable(true);
 
-        //runs the speed, turnCheck, and battlePhase
-        speed();
-        turnCheck();
+        //runs the turn system and battleStart
+        turnSystem();
     }
 
 
@@ -289,15 +269,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         switch (v.getId()) {
             case R.id.fight:
                 herofight = true;
-                battlePhase();
+                battleStart();
                 break;
             case R.id.rest:
                 //this will check if the hero was enough mana points
                 if (heroMp - restHealManaCost >= 0) {
                     heroRest = true;
-                    battlePhase();
+                    battleStart();
                 }else {
-                    menuText.setText(heroName + "has failed to rest");
+                    menuText.setText("Insufficient MP");
+                    hideButton();
+                    heroRest = false;
                 }
                 break;
             case R.id.menuBox:
